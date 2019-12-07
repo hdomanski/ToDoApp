@@ -1,108 +1,89 @@
 import React, { Component } from "react";
-import "./App.css";
-import Header from "./Header";
-import ToDo from "./ToDo";
-import Done from "./Done";
+import TaskList from "./TaskList";
+
+import FormAddTask from "./FormAddTask";
 
 class App extends Component {
   state = {
-    newTask: "",
-    piority: false,
-    tasks: []
-  };
-
-  onSubmit = e => {
-    e.preventDefault();
-    const { tasks, newTask, piority } = this.state;
-
-    tasks.push({
-      id: tasks.length + 1,
-      text: newTask,
-      done: false,
-      delete: false,
-      piority: piority,
-      doneDate: ""
-    });
-
-    this.setState({
-      tasks: tasks,
-      piority: false,
-      newTask: ""
-    });
-  };
-
-  handlePiority = e => {
-    const checked = e.target.checked;
-
-    this.setState({
-      piority: checked
-    });
-  };
-
-  handleInput = e => {
-    this.setState({
-      newTask: e.target.value
-    });
+    tasks: [
+      {
+        id: 0,
+        text: "Task1",
+        piority: true,
+        active: true,
+        date: "2020.10.10",
+        doneDate: null
+      },
+      {
+        id: 1,
+        text: "Task2",
+        piority: false,
+        active: true,
+        date: "2021.10.12",
+        doneDate: null
+      },
+      {
+        id: 2,
+        text: "Task3",
+        piority: false,
+        active: false,
+        date: "2021.10.12",
+        doneDate: null
+      }
+    ]
   };
 
   handleDelete = id => {
-    const tasks = this.state.tasks.map(task => {
-      if (id === task.id) {
-        task.delete = !task.delete;
-      }
-      // console.log(task);
-      return task;
-    });
+    let tasks = [...this.state.tasks];
+    tasks = tasks.filter(task => task.id !== id);
 
     this.setState({
-      tasks: tasks
+      tasks
     });
   };
 
   handleDone = id => {
-    const date =
-      new Date().getFullYear() +
-      "-" +
-      (new Date().getMonth() + 1) +
-      "-" +
-      new Date().getDate();
+    let doneDate = new Date();
+    doneDate = doneDate.getTime();
 
-    new Date().getDate();
-    const tasks = this.state.tasks.map(task => {
-      if (id === task.id) {
-        task.done = !task.done;
-        task.doneDate = date;
+    let tasks = [...this.state.tasks];
+    tasks = tasks.map(task => {
+      if (task.id === id) {
+        task.active = false;
+        task.doneDate = doneDate;
+        console.log("zrobione");
+        return task;
       }
-      // console.log(task);
-      return task;
+      this.setState({
+        tasks
+      });
+      return null;
     });
+  };
 
-    this.setState({
-      tasks: tasks
-      // doneDate: date
-    });
+  handleClick = (text, checked, date) => {
+    const task = {
+      id: this.state.tasks.length,
+      text: text,
+      piority: checked,
+      active: true,
+      date: date,
+      doneDate: null
+    };
+
+    this.setState(prevState => ({
+      tasks: [...prevState.tasks, task] /// obaczaj to
+    }));
   };
 
   render() {
     return (
       <React.Fragment>
-        <Header
-          handleInput={this.handleInput}
-          value={this.state.newTask}
-          piority={this.state.piority}
-          addTask={this.handleAddTask}
-          onSubmit={this.onSubmit}
-          handlePiority={this.handlePiority}
-        />
-        <ToDo
+        <FormAddTask handleClick={this.handleClick} />
+        <TaskList
           tasks={this.state.tasks}
           handleDelete={this.handleDelete}
           handleDone={this.handleDone}
-        />
-        <Done
-          tasks={this.state.tasks}
-          handleDelete={this.handleDelete}
-          currentlyDate={this.currentlyDate}
         />
       </React.Fragment>
     );
